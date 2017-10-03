@@ -1,0 +1,55 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="speech_prompt">Say something&#8230;</string>
+    <string name="speech_not_supported">Sorry! Your device doesn\'t support speech input</string>
+    <string name="tap_on_mic">Tap on mic to speak</string>
+
+    <string name="charThai1">กอไก่</string>
+    <string name="charThai2">ขอไข่</string>
+    <string name="charThai3">ขอขวด</string>
+    <string name="charThai4">คอควาย</string>
+    <string name="charThai5">คอคน</string>
+    <string name="charThai6">คอระฆัง</string>
+    <string name="charThai7">งองู</string>
+    <string name="charThai8">จอจาน</string>
+    <string name="charThai9">ฉฉิ่ง</string>
+    <string name="charThai10">ชอช้าง</string>
+    <string name="charThai11">ซอโซ่</string>
+    <string name="charThai12">chaucer</string>
+    <string name="charThai13">ยอหญิง</string>
+    <string name="charThai14">ดอชะดา</string>
+    <string name="charThai15">ตอปะตัก</string>
+    <string name="charThai16">ท้อฐาน</string>
+    <string name="charThai17">ทอนางมณโท</string>
+    <string name="charThai18">ทอผู้เฒ่า</string>
+    <string name="charThai19">เณร</string>
+    <string name="charThai20">ดอเด็ก</string>
+    <string name="charThai21">ตอเต่า</string>
+    <string name="charThai22">ถอถุง</string>
+    <string name="charThai23">ทอทหาร</string>
+    <string name="charThai24">ธอทง</string>
+    <string name="charThai25">นอหนู</string>
+    <string name="charThai26">บอใบไม้</string>
+    <string name="charThai27">ปอปลา</string>
+    <string name="charThai28">ผอผึ้ง</string>
+    <string name="charThai29">ฝา</string>
+    <string name="charThai30">พอพาน</string>
+    <string name="charThai31">for fun</string>
+    <string name="charThai32">พอสำเภา</string>
+    <string name="charThai33">มอม้า</string>
+    <string name="charThai34">ยอยักษ์</string>
+    <string name="charThai35">รอเรือ</string>
+    <string name="charThai36">รอริง</string>
+    <string name="charThai37">วอแหวน</string>
+    <string name="charThai38">ศ.ศาลา</string>
+    <string name="charThai39">ฤาษี</string>
+    <string name="charThai40">สอเสือ</string>
+    <string name="charThai41">หอห*บ</string>
+    <string name="charThai42">จอจุฬา</string>
+    <string name="charThai43">อออ่าง</string>
+    <string name="charThai44">ฮอนกฮูก</string>
+
+
+</resources>
