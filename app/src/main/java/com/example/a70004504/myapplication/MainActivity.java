@@ -23,10 +23,15 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
+
+import static java.lang.System.in;
 
 public class MainActivity extends AppCompatActivity {
     private TextView txtSpeechInput;
+    private TextView txtProvince;
     private ImageButton btnSpeak;
     private final int REQ_CODE_SPEECH_INPUT = 100;
 
@@ -38,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
             "ฬ", "อ", "ฮ"};
 
     public String pathRoot = Environment.getExternalStorageDirectory().getAbsolutePath() + "/aaTutorial";
+    private List<String> listProvinceThailand;
 
 
     @Override
@@ -45,12 +51,64 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         txtSpeechInput = (TextView) findViewById(R.id.txtSpeechInput);
+        txtProvince = (TextView) findViewById(R.id.txtProvince);
         btnSpeak = (ImageButton) findViewById(R.id.btnSpeak);
 
 
         File dir = new File(pathRoot);
         dir.mkdirs();
 
+
+        // province Thailand
+        //Get it in an array of strings
+        String[] months = getResources().getStringArray(R.array.provinceThailand);
+
+        //Convert it into a list
+        List<String> monthsList = new ArrayList<String>();
+        listProvinceThailand = Arrays.asList(months);
+
+        String textS = "";
+//
+//        for (int i = 0; i < months.length; i++) {
+//            textS += months[i]+'\n';
+//        }
+//        Log.d("list",textS);
+
+//        for (int i = 0; i < listProvinceThailand.size(); i++) {
+//            textS += listProvinceThailand.get(i) + '\n';
+//            int index = -1;
+//
+//        }
+//        Log.d("lists", textS);
+//
+//
+//        if (listProvinceThailand.contains("นครปฐม")) {
+//            // found a match to "software"
+//            Toast.makeText(this, "Hello contains " + listProvinceThailand.contains("นครปฐม"), Toast.LENGTH_SHORT).show();
+//        }
+//
+//        for (int i = 0; i < listProvinceThailand.size(); i++) {
+//            if (listProvinceThailand.get(i).equals("นครปฐม")) {
+//                Toast.makeText(this, "find indexOf" + listProvinceThailand.indexOf("นครปฐม"), Toast.LENGTH_SHORT).show();
+//                break;
+//            }
+//        }
+//
+//
+//        int indexString = listProvinceThailand.indexOf("นครปฐม");
+//        Toast.makeText(this, "find" + listProvinceThailand.get(indexString), Toast.LENGTH_SHORT).show();
+//
+//
+//        String str = "1234";
+//        String str2 = String.format("%-7s", str).replace(' ', ' ');
+//        Log.d("xxx", str2);
+//
+//
+//        ArrayList<String> indexCutProvince = new ArrayList<String>();
+//        Log.d("test", String.valueOf(indexCutProvince));
+
+        //----------------------
+//        replace text
 
 //        String str="fgdfg12°59'50\" Nfr | gdfg: 80°15'25\" Efgd";
 //        String str="1กฟ6314\" Nfr | gdfg: 80°15'25\" Efgd";
@@ -93,39 +151,67 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    String resultLicense = "";
+    String textLicense = "";
+    String textProvince = "";
+    String textChangeChar = "";
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        String result22 = new String();
 
         switch (requestCode) {
             case REQ_CODE_SPEECH_INPUT: {
                 if (resultCode == RESULT_OK && null != data) {
 
                     ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    final String textChangeChar = ChangeCharector(result.get(0)).replace(" ","");
+
+                    textChangeChar = ChangeCharector(result.get(0)).replace(" ", "");
                     Toast.makeText(this, textChangeChar, Toast.LENGTH_LONG).show();
 
-                    txtSpeechInput.setText(textChangeChar);
+                    ArrayList<String> provinceTextOnly = CutProvinceText(textChangeChar);
 
-                    // add space " " char text
-                    for (int i = 0; i < textChangeChar.length(); i++) {
-                        char c = textChangeChar.charAt(i);
-                        result22 += " " + c;
+//                    Toast.makeText(this, "" + provinceTextOnly.get(0) + " is province", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(this, "" + provinceTextOnly.get(1)+"is license Plate", Toast.LENGTH_SHORT).show();
+
+
+                    if (provinceTextOnly.size() != 0) {
+                        textLicense = provinceTextOnly.get(1);
+                        textProvince = provinceTextOnly.get(0);
+
+                        txtSpeechInput.setText(textLicense);
+                        txtProvince.setText(textProvince);
+
+                        //add space " " char text
+//                    for (int i = 0; i < textChangeChar.length(); i++) {
+//                        char c = textChangeChar.charAt(i);
+//                        result22 += " " + c;
+//                    }
+
+                        for (int i = 0; i < textLicense.length(); i++) {
+                            char c = textLicense.charAt(i);
+                            resultLicense += " " + c;
+                        }
+
+                        // Speech Text...
+                        MyTTS.getInstance(MainActivity.this).speak(resultLicense + textProvince);
+
+                        resultLicense = "";
+
+                        // Check text File
+                        SearchTextLicensePlate(textChangeChar);
+
+
+                    } else {
+                        txtSpeechInput.setText("");
+                        txtProvince.setText("");
+
+                        Toast.makeText(this, "กรุณาระบุ จังหวัด", Toast.LENGTH_SHORT).show();
+                        MyTTS.getInstance(MainActivity.this).speak("กรุณาระบุ จังหวัด");
+
                     }
-
-                    // Speech Text...
-                    //Toast.makeText(this, result22, Toast.LENGTH_SHORT).show();
-//                    MyTTS.getInstance(MainActivity.this).speak(String.valueOf(txtSpeechInput.getText()));
-
-                    MyTTS.getInstance(MainActivity.this).speak(String.valueOf(result22));
-//                    MyTTS.getInstance(MainActivity.this).speak("กอไก่ 3 0 9 0");
-
-                    // Check text File
-
-                    SearTextLicensePlate(textChangeChar);
-
                 }
                 break;
             }
@@ -133,10 +219,44 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private ArrayList<String> CutProvinceText(String textAllSearch) {
+        ArrayList<String> indexCutProvince = new ArrayList<String>();
+        String licensePlate = textAllSearch;
+        String provinceThai = textAllSearch;
+
+        if (indexCutProvince.size() != 0) {
+            Iterator<String> removeList = indexCutProvince.iterator();
+            while (removeList.hasNext()) {
+                String s = removeList.next(); // must be called before you can call i.remove()
+                // Do something
+                removeList.remove();
+            }
+        }
 
 
-    private void SearTextLicensePlate(String txtSearch) {
-        String line;
+        for (int i = 0; i < listProvinceThailand.size(); i++) {
+            indexCutProvince.clear();
+
+            String getPro = listProvinceThailand.get(i);
+            if (provinceThai.contains(getPro)) {
+                int index = provinceThai.indexOf(getPro);
+                provinceThai = provinceThai.substring(index);
+
+
+                indexCutProvince.add(provinceThai);
+                indexCutProvince.add(licensePlate.substring(0, index));
+
+                break;
+            }
+        }
+
+
+        return indexCutProvince;
+    }
+
+
+    private void SearchTextLicensePlate(String txtSearch) {
+        String line = "";
 
 //        Toast.makeText(this, "Hi" + txtSearch, Toast.LENGTH_SHORT).show();
         //*** Read Text File SD Card ***/
@@ -152,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
             while ((line = br.readLine()) != null) {
                 myArr.add(line);
                 //Toast.makeText(this, "........"+line, Toast.LENGTH_SHORT).show();
-                if(line.equals(txtSearch)){
+                if (line.equals(txtSearch)) {
                     Toast.makeText(this, "เจอเลขทะเบียน" + line, Toast.LENGTH_SHORT).show();
 
                     new Handler().postDelayed(new Runnable() {
@@ -161,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
                             //Do something after 100ms
                             mp.start();
                         }
-                    }, 4000);
+                    }, 5000);
 
 
 //                    MyTTS.getInstance(MainActivity.this).speak("เจอเลขทะเบียน");
@@ -171,11 +291,10 @@ public class MainActivity extends AppCompatActivity {
 //                Toast.makeText(this, line + txtSearch, Toast.LENGTH_SHORT).show();
             }
 
-            if(notFound == 0){
+            if (notFound == 0) {
 //                Toast.makeText(this, "Not Math License Plate", Toast.LENGTH_SHORT).show();
                 MyTTS.getInstance(MainActivity.this).speak("ไม่เจอเลขทะเบียนนี้");
             }
-
 
 
             br.close();
