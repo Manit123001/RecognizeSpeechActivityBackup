@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView txtProvince;
     private ImageButton btnSpeak;
     private final int REQ_CODE_SPEECH_INPUT = 100;
+    private final int REQ_CODE_SPEECH_INPUT_AGAIN = 200;
 
     final String[] ccThai = {"ก", "ข", "ฃ", "ค", "ฅ",
             "ฆ", "ง", "จ", "ฉ", "ช", "ซ", "ฌ", "ญ", "ฎ",
@@ -44,6 +45,14 @@ public class MainActivity extends AppCompatActivity {
 
     public String pathRoot = Environment.getExternalStorageDirectory().getAbsolutePath() + "/aaTutorial";
     private List<String> listProvinceThailand;
+
+
+    String resultLicense = "";
+    String textLicense = "";
+    String textProvince = "";
+    String textChangeChar = "";
+
+    private final Boolean SPECK_CHECK_TRUE = true;
 
 
     @Override
@@ -126,13 +135,13 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                promptSpeechInput();
+                promptSpeechInput(REQ_CODE_SPEECH_INPUT);
             }
         });
     }
 
 
-    private void promptSpeechInput() {
+    private void promptSpeechInput(int REQ_CODE_SPEECH_INPUT) {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
 
@@ -151,11 +160,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    String resultLicense = "";
-    String textLicense = "";
-    String textProvince = "";
-    String textChangeChar = "";
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -171,46 +175,37 @@ public class MainActivity extends AppCompatActivity {
                     textChangeChar = ChangeCharector(result.get(0)).replace(" ", "");
                     Toast.makeText(this, textChangeChar, Toast.LENGTH_LONG).show();
 
-                    ArrayList<String> provinceTextOnly = CutProvinceText(textChangeChar);
 
-//                    Toast.makeText(this, "" + provinceTextOnly.get(0) + " is province", Toast.LENGTH_SHORT).show();
-//                    Toast.makeText(this, "" + provinceTextOnly.get(1)+"is license Plate", Toast.LENGTH_SHORT).show();
+                    // check End speech จบ
+                    if (textChangeChar.length() >= 9) {
+                        if (textChangeChar.contains("จบ")) {
 
+                            ShowProcessLicensePlate(true);
+                        } else {
 
-                    if (provinceTextOnly.size() != 0) {
-                        textLicense = provinceTextOnly.get(1);
-                        textProvince = provinceTextOnly.get(0);
+                            Toast.makeText(this, "กรุณาพูดจบ ด้วย", Toast.LENGTH_SHORT).show();
+                            MyTTS.getInstance(MainActivity.this).speak("กรุณาพูดจบ ด้วย");
 
+                            ShowProcessLicensePlate(false);
+                        }
+                    }
+                }
+                break;
+            }
+            case REQ_CODE_SPEECH_INPUT_AGAIN: {
+
+                if (resultCode == RESULT_OK && null != data) {
+
+                    ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+
+                    // check End speech จบ
+                    if (result.get(0).contains("จบ")) {
                         txtSpeechInput.setText(textLicense);
                         txtProvince.setText(textProvince);
-
-                        //add space " " char text
-//                    for (int i = 0; i < textChangeChar.length(); i++) {
-//                        char c = textChangeChar.charAt(i);
-//                        result22 += " " + c;
-//                    }
-
-                        for (int i = 0; i < textLicense.length(); i++) {
-                            char c = textLicense.charAt(i);
-                            resultLicense += " " + c;
-                        }
-
-                        // Speech Text...
-                        MyTTS.getInstance(MainActivity.this).speak(resultLicense + textProvince);
-
-                        resultLicense = "";
-
-                        // Check text File
-                        SearchTextLicensePlate(textChangeChar);
-
-
+                        SpeakAndSearch();
                     } else {
-                        txtSpeechInput.setText("");
-                        txtProvince.setText("");
-
-                        Toast.makeText(this, "กรุณาระบุ จังหวัด", Toast.LENGTH_SHORT).show();
-                        MyTTS.getInstance(MainActivity.this).speak("กรุณาระบุ จังหวัด");
-
+                        Toast.makeText(this, "กรุณาพูดจบ ด้วย", Toast.LENGTH_SHORT).show();
+                        promptSpeechInput(REQ_CODE_SPEECH_INPUT_AGAIN);
                     }
                 }
                 break;
@@ -219,7 +214,68 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void ShowProcessLicensePlate(Boolean SPECK_CHECK) {
+
+        //Process Province Thailand
+        ArrayList<String> provinceTextOnly = CutProvinceText(textChangeChar);
+
+//        Toast.makeText(this, "" + provinceTextOnly.get(0) + " is province", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "" + provinceTextOnly.get(1) + "is license Plate", Toast.LENGTH_SHORT).show();
+
+
+        if (provinceTextOnly.size() != 0) {
+            textLicense = provinceTextOnly.get(1);
+            textProvince = provinceTextOnly.get(0);
+
+
+            //add space " " char text
+//                    for (int i = 0; i < textChangeChar.length(); i++) {
+//                        char c = textChangeChar.charAt(i);
+//                        result22 += " " + c;
+//                    }
+
+            for (int i = 0; i < textLicense.length(); i++) {
+                char c = textLicense.charAt(i);
+                resultLicense += " " + c;
+            }
+
+            if (SPECK_CHECK == SPECK_CHECK_TRUE) {
+                txtSpeechInput.setText(textLicense);
+                txtProvince.setText(textProvince);
+
+                SpeakAndSearch();
+
+            } else {
+                // speak again please
+                promptSpeechInput(REQ_CODE_SPEECH_INPUT_AGAIN);
+
+            }
+
+
+        } else {
+            txtSpeechInput.setText("");
+            txtProvince.setText("");
+
+            Toast.makeText(this, "กรุณาระบุ จังหวัด", Toast.LENGTH_SHORT).show();
+            MyTTS.getInstance(MainActivity.this).speak("กรุณาระบุ จังหวัด");
+
+        }
+    }
+
+    private void SpeakAndSearch() {
+        // Speech Text...
+        MyTTS.getInstance(MainActivity.this).speak(resultLicense + textProvince);
+
+        // Check text File Local of Mobile
+        SearchTextLicensePlate((resultLicense + textProvince).replace(" ", ""));
+
+        resultLicense = "";
+
+    }
+
+
     private ArrayList<String> CutProvinceText(String textAllSearch) {
+
         ArrayList<String> indexCutProvince = new ArrayList<String>();
         String licensePlate = textAllSearch;
         String provinceThai = textAllSearch;
@@ -237,13 +293,14 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < listProvinceThailand.size(); i++) {
             indexCutProvince.clear();
 
-            String getPro = listProvinceThailand.get(i);
-            if (provinceThai.contains(getPro)) {
-                int index = provinceThai.indexOf(getPro);
+            String getProvince = listProvinceThailand.get(i);
+            if (provinceThai.contains(getProvince)) {
+                int index = provinceThai.indexOf(getProvince);
                 provinceThai = provinceThai.substring(index);
 
+//                Toast.makeText(this, "จังหวัดคือ " + getProvince, Toast.LENGTH_SHORT).show();
 
-                indexCutProvince.add(provinceThai);
+                indexCutProvince.add(getProvince);
                 indexCutProvince.add(licensePlate.substring(0, index));
 
                 break;
@@ -280,11 +337,11 @@ public class MainActivity extends AppCompatActivity {
                         public void run() {
                             //Do something after 100ms
                             mp.start();
+//                            MyTTS.getInstance(MainActivity.this).speak("เจอเลขทะเบียน");
                         }
-                    }, 5000);
+                    }, 4500);
 
 
-//                    MyTTS.getInstance(MainActivity.this).speak("เจอเลขทะเบียน");
                     notFound = 1;
                     break;
                 }
