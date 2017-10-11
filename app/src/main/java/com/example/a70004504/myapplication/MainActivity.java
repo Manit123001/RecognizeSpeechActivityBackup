@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -17,6 +18,11 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.a70004504.myapplication.model.SpeakThai;
+import com.example.a70004504.myapplication.sqlite.SQLiteCrud;
+import com.example.a70004504.myapplication.sqlite.ShowDataActivity;
+import com.example.a70004504.myapplication.sqlite.db.DBHelper;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -53,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
     String textChangeChar = "";
 
     private final Boolean SPECK_CHECK_TRUE = true;
+    private DBHelper mHelper;
+    private List<SpeakThai> listTextThai;
 
 
     @Override
@@ -131,6 +139,13 @@ public class MainActivity extends AppCompatActivity {
 //        Toast.makeText(this, numberSecond, Toast.LENGTH_SHORT).show();
 
 
+
+
+
+//        textChangeChar = ChangeReplaceDB("1หอระฆังneswlove1234กรุงเทพมหานคร");
+//        Toast.makeText(this, "" + textChangeChar, Toast.LENGTH_SHORT).show();
+
+
         btnSpeak.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -173,6 +188,8 @@ public class MainActivity extends AppCompatActivity {
                     ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
 
                     textChangeChar = ChangeCharector(result.get(0)).replace(" ", "");
+                    textChangeChar = ChangeReplaceDB(textChangeChar);
+
                     Toast.makeText(this, textChangeChar, Toast.LENGTH_LONG).show();
 
 
@@ -448,7 +465,48 @@ public class MainActivity extends AppCompatActivity {
                 .replace(getString(R.string.charThai43), ccThai[42])
                 .replace(getString(R.string.charThai44), ccThai[43]);
 
+
         return text2;
     }
+
+
+    private String ChangeReplaceDB(String charText) {
+        mHelper = new DBHelper(MainActivity.this);
+        listTextThai = mHelper.getFriendList();
+
+
+        if (listTextThai.size() != 0) {
+            for (SpeakThai member : listTextThai) {
+
+                charText = charText.replace(member.getTextSpeak(), member.getTextSolve());
+
+            }
+        }
+
+
+        return charText;
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_add) {
+            Intent addTextThai = new Intent(this, ShowDataActivity.class);
+
+            startActivity(addTextThai);
+
+//            overridePendingTransition(android.R.anim.fade_in,
+//                    android.R.anim.fade_out);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 }
 

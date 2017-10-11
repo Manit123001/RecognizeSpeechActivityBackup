@@ -23,16 +23,25 @@
              </intent-filter>
         </activity>
         <activity android:name=".ReadFileSDCardActivity">
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
+        </activity>
+        <activity android:name=".ReadWriteTextActivity" />
+        <activity android:name=".sqlite.SQLiteCrud">
             <!--<intent-filter>-->
                 <!--<action android:name="android.intent.action.MAIN" />-->
 
                 <!--<category android:name="android.intent.category.LAUNCHER" />-->
             <!--</intent-filter>-->
         </activity>
-        <activity android:name=".ReadWriteTextActivity">
-
-
-        </activity>
+        <activity android:name=".sqlite.ShowDataActivity" />
+        <activity android:name=".sqlite.DetailActivity" />
+        <activity android:name=".sqlite.AddFriendActivity"></activity>
     </application>
 
 </manifest>
